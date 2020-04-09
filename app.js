@@ -1,74 +1,50 @@
 const path = require('path');
 const Convert = require('ebook-convert');
-const PDF2Pic = require("pdf2pic");
-const appDir = path.dirname(require.main.filename);
+const {
+  pdfToImage
+} = require('./src/pdfToImage');
 const colors = require('colors');
-const fs = require('fs');
+const constant = require('./src/constant');
+const {
+  getFileNameByArgument
+} = require('./src/argument');
+const helper = require('./src/helper');
 
 
-const argument = process.argv.slice(2);
-let filename;
-if (argument.length <= 0) {
-  console.log('plz input epub filename. e.g. node app.js example.epub'.red);
-  return;
-} else {
-    filename = argument.pop()
-}
-console.log(`ipnut epub file name: "${filename}"`.green);
+const fileName = getFileNameByArgument();
+let targetFilePath = path.join(constant.appDir, fileName);
 
-if (!fs.existsSync(`${appDir}/${filename}`)) {
-  console.log(`can't find ${appDir}/${filename}`.red);
-  return;
+if (!helper.isFileExists(targetFilePath)) {
+  return console.log(`can't find ${targetFilePath}`.red);
 }
 
-const fileExtension = filename.slice((filename.lastIndexOf(".") - 1 >>> 0) + 2);
+const fileExtension = helper.getFileExtension(targetFilePath);
 if (!fileExtension) {
-  console.log('missing file extension'.red);
-  return;
+  return console.log(`missing file extension`.red);
 }
 
-console.log('Ready to Process');
+console.log('Ready to Process'.underline.white);
+console.log(`\t target file path: ${targetFilePath}`.green);
 
 const options = {
-  input: `${appDir}/${filename}`, //path to epub
-  output: `${appDir}/output.pdf`, //path to pdf
+  input: targetFilePath, //path to epub
+  output: constant.outputFilePath,
   // insertBlankLine: false,
   // insertBlankLineSize: '1',
   // lineHeight: '12',
-  marginTop: '-1',
-  marginRight: '-1',
-  marginBottom: '-1',
-  marginLeft: '-1',
+  marginTop: '0',
+  marginRight: '0',
+  marginBottom: '0',
+  marginLeft: '0',
 };
-
-
-const pdfToImage = (parsePdfPath) => {
-  // const pages = [] || -1;
-  const pages = -1; // all
-
-  const pdf2pic = new PDF2Pic({
-    density: 100,           // output pixels per inch
-    savename: "untitled",   // output file name
-    savedir: "./images",    // output file location
-    format: "png",          // output file format
-    // size: "1280x1280"         // output size in pixels
-    size: "1920x1920",
-  });
-
-  pdf2pic.convertBulk(parsePdfPath, pages).then((resolve) => {
-    console.log("image converter successfully!");
-
-    return resolve;
-  });
-}
 
 if ('epub' === fileExtension) {
   Convert(options, function (err) {
     if (err) console.log(err);
 
-    pdfToImage('output.pdf');
+    pdfToImage(constant.outputFilePath);
   });
 } else {
-  console.log('skip epub to pdf');
-  pdfToImage(filename);
+  console.log('skip epub to pdf...'.underline.white);
+  pdfToImage(fileName);
 }
