@@ -3,7 +3,7 @@ const Convert = require('ebook-convert');
 const {
   pdfToImage
 } = require('./src/pdfToImage');
-const colors = require('colors');
+const chalk = require('chalk');
 const constant = require('./src/constant');
 const {
   getFileNameByArgument
@@ -15,16 +15,16 @@ const fileName = getFileNameByArgument();
 let targetFilePath = path.join(constant.appDir, fileName);
 
 if (!helper.isFileExists(targetFilePath)) {
-  return console.log(`can't find ${targetFilePath}`.red);
+  return console.log(chalk.red(`can't find ${targetFilePath}`));
 }
 
 const fileExtension = helper.getFileExtension(targetFilePath);
 if (!fileExtension) {
-  return console.log(`missing file extension`.red);
+  return console.log(chalk.red(`missing file extension`));
 }
 
-console.log('Ready to Process'.underline.white);
-console.log(`\t target file path: ${targetFilePath}`.green);
+console.log(chalk.underline.white('Ready to Process'));
+console.log(chalk.green(`\t target file path: ${targetFilePath}`));
 
 const options = {
   input: targetFilePath, //path to epub
@@ -45,6 +45,6 @@ if ('epub' === fileExtension) {
     pdfToImage(constant.outputFilePath);
   });
 } else {
-  console.log('skip epub to pdf...'.underline.white);
+  console.log(chalk.underline.white('skip epub to pdf...'));
   pdfToImage(fileName);
 }

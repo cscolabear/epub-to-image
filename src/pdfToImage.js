@@ -1,5 +1,6 @@
 const PDFImage = require("pdf-image").PDFImage;
 const constant = require('./constant');
+const chalk = require('chalk');
 
 
 const pdfToImage = (parsePdfPath) => {
@@ -17,7 +18,7 @@ const pdfToImage = (parsePdfPath) => {
   const pdfImage = new PDFImage(parsePdfPath, options);
 
   pdfImage.numberOfPages().then(totalPages => {
-    console.log(`\t total pages: ${totalPages}`.underline.green);
+    console.log(chalk.underline.green(`\t total pages: ${totalPages}`));
 
     batch = Math.ceil(totalPages / constant.perPages);
     for (let index = 1; index <= 1; index++) {
@@ -28,7 +29,7 @@ const pdfToImage = (parsePdfPath) => {
         if (page > totalPages) {break;}
 
         pdfImage.convertPage(page).then(function (imagePath) {
-          console.log(`\t ...${imagePath}`.gray);
+          console.log(chalk.gray(`\t ...${imagePath}`));
         });
       }
     }
